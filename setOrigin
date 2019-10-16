@@ -1,0 +1,83 @@
+procedure ( setorigin(argi arg2) ;Declare procedure 
+  let((selcells objTypeCheck oldLowx oldLowy oldUpx oldUpy diffx diffy newUpx newUpy newLowerLeft newUpperRight newLocation) ;Declare variables
+    objTypeCheck = car(geGetSelSet()) ->objType ;set check type, set to variable for case
+    case(objTypeCheck ; case check for objType
+      ( "rect" ;case check for rect
+        oldLowX = caaar(geGetSelSet()->Box) 
+        oldLowY = cadaar(geGetSelSet()->Box) 
+        oldUpX = caadar(geGetSelSet() -->Box) 
+        oldUpY = car( cdadar(geGetSelSet() ->bBox)) ;grab 4 coodinates of bBox
+        diffx = oldUpX-oldLowX 
+        diffy = oldUpy-oldLowy ;form size of rectangle
+        newUpX = argl+diffx newUpY = arg2+diffy ;generate new Upper Right coordinates
+        newLowerLeft = list(argl arg2) newUpperRight = list(newUpx newUpY) ;generate new bBox coordinates
+        newLocation = list(newLowerLeft newUpperRight) ;apply coordinates to variable
+        car(geGetSelSet()) ->Box = newLocation ; change bBox coodinates to stored variable coordinates
+        printf("Selected rectangle moved") 
+      ) ;end rect check
+      ( "inst" ;case check for inst
+        newLocation = list(argi arg2)
+        car(geGetSelSet()) ->xy = newLocation ;if inst, use xy instead of boxi
+        printf("selected instance moved")
+      ) ;end inst check
+      ( "path" ;case check for path
+        oldLowX = caaar(geGetSelSet()->points) 
+        oldLowy = cadaar(geGetSelSet()->points) 
+        oldUpX = caadar(geGetSelSet() ->points) 
+        oldUpY = car( cdadar(geGetSelSet() ->points)) ;grab 4 coordinates of "points"
+        diffx = oldUpX-oldLowX diffy = oldUpy-oldLowy ;form size of rectangle
+        newUpX = argl+diffx 
+        newUpY = arg2+diffy ;generate new Upper Right coordinates
+        newLowerLeft = list(argi arg2) 
+        newUpperRight = list(newUpx newUpY) ;generate new "points" coordinates
+        newLocation = list(newLowerLeft newUpperRight) ;apply coordinates to variable
+        car(geGetSelSet()) ->points = newLocation ;change "points" coordinates to stored variable coordinates
+        printf("Selected path moved")
+      ) ;end path check
+      ( "stdVia" ; case check for stdVia
+        newLocation = list(argi arg2)
+        car(geGetSelSet()->origin = newLocation ;if stdVia, use origin instead of bBox
+        printf ("Selected via moved")
+      ) ;end via check
+      ( "nil" ; case check for lack of object
+        printf("Please select and object to move"),
+      ) ;end nil check
+      ) ;end case 
+  ) ;end let
+);end procedure
+
+;creating a fillable form to move the selected object -- lower left to coordinates 
+let((newx newy) ;declare variable
+  newx = hiCreateFloatField( 
+    ?name 'newxCoord 
+    ?prompt "New Lower Left x Value: "
+    ?value 0.0 
+    ?defValue 0.0 
+    ?range '(-100 100)
+  ) ;field for new x coordinate
+
+  newy = hiCreateFloatField 
+    ?name 'newyCoord 
+    ?prompt "New Lower Left Y Value: "
+    ?value 0.0 
+    ?defvalue 0.0 
+    ?range '(-100 100)
+  ) ;field for new y coordinate
+
+  GB_MoveSelObj = hicreateAppForm(
+    ?name 'moveSelObj 
+    ?formTitle "Move Selected Object" 
+    ?callback "setorigin(GB_MoveSelObj->newxCoord->value GB_MoveSelObj->newyCoord->value)" 
+    ?fields list(newx newy) 
+  ) ;create form and apply variables
+) ;end let
+
+procedure (moveSelObjForm()
+  if(geGetSelSet() == nil ; check to see if object selected
+    then
+      printf("ERROR: Please select an object") ;throw an error if no selected object
+    else
+      status = hiDisplayForm(moveSelObj) ;if not nil, an object is selected, and the form can be used
+  ) ;end if
+) ;end proc
+
