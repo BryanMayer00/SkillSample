@@ -3,9 +3,9 @@ procedure ( setorigin(argi arg2) ;Declare procedure
     objTypeCheck = car(geGetSelSet()) ->objType ;set check type, set to variable for case
     case(objTypeCheck ; case check for objType
       ( "rect" ;case check for rect
-        oldLowX = caaar(geGetSelSet()->Box) 
-        oldLowY = cadaar(geGetSelSet()->Box) 
-        oldUpX = caadar(geGetSelSet() -->Box) 
+        oldLowX = caaar(geGetSelSet()->bBox) 
+        oldLowY = cadaar(geGetSelSet()->bBox) 
+        oldUpX = caadar(geGetSelSet() -->bBox) 
         oldUpY = car( cdadar(geGetSelSet() ->bBox)) ;grab 4 coodinates of bBox
         diffx = oldUpX-oldLowX 
         diffy = oldUpy-oldLowy ;form size of rectangle
